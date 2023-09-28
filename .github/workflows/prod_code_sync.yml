@@ -15,7 +15,7 @@ jobs:
 
       - name: Iterate over feature branches
         run: |
-          base_branch='${{ vars.CI.DEFAULT_BRANCH }}'
+          base_branch='${{ vars.DEFAULT_BRANCH }}'
 
           for branch in ${{ vars.FEATURE_BRANCHES }}; do
             feature_branch="refs/remotes/origin/$branch"
