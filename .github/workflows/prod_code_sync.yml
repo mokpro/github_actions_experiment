@@ -42,9 +42,7 @@ jobs:
                   --head $base_branch \
                   --title "Merge $base_branch into $feature_branch" \
                   --body "This pull request merges $base_branch into $feature_branch." \
-                  --label "auto-update" \
-                  --reviewer ${{ vars.REVIEWERS }}
-                
+                  --label "auto-update"                
                 if [ $? -ne 0 ]; then
                   echo "Failed to create PR merging $base_branch into $feature_branch"
                 fi
