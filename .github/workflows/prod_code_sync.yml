@@ -1,0 +1,60 @@
+name: Merge features from Default Branch to Feature Branch and Notify
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  auto_merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Iterate over feature branches
+        run: |
+          base_branch="${{ vars.DEFAULT_BRANCH }}"
+          git checkout $base_branch
+          git fetch $base_branch
+          git reset --hard origin/$base_branch
+
+          for branch in ${{ vars.FEATURE_BRANCHES }}; do
+            feature_branch="refs/remotes/origin/$branch"
+
+            # Compare $base_branch with the feature branch
+            if [[ $(git log --oneline $feature_branch..$base_branch) ]]; then
+              echo "$base_branch has newer commits than $branch"
+              
+              # Merge $base_branch into feature branch
+              git checkout $branch
+              git merge $base_branch -m "Merge $base_branch into $branch"
+              
+              # Check if the merge was successful
+              if [ $? -eq 0 ]; then
+                echo "Merge successful. Creating a pull request..."
+                new_branch="merge-$base_branch-to-$branch"
+                git checkout -b $new_branch
+                gh pr create \
+                  --base $branch \
+                  --head $base_branch \
+                  --title "Merge $base_branch into $branch" \
+                  --body "This pull request merges $base_branch into $branch." \
+                  --label "auto-update" \
+                  --reviewer ${{ vars.REVIEWERS }}
+                
+                if [ $? -ne 0 ]; then
+                  echo "Failed to create PR merging $base_branch into $branch"
+                fi
+
+              else
+                echo "Failed to merge $base_branch into $branch"
+                git merge --abort
+              fi
+            else
+              echo "$branch is up to date with $base_branch"
+            fi
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
