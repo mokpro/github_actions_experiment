@@ -21,7 +21,7 @@ jobs:
             git fetch origin $feature_branch
 
             # Compare $base_branch with the feature branch
-            if [[ $(git log --oneline $feature_branch..$base_branch) ]]; then
+            if [[ $(git log --oneline origin/$feature_branch..$base_branch) ]]; then
               echo "$base_branch has newer commits than $feature_branch"
               
               # Merge $base_branch into feature branch
