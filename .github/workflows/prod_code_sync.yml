@@ -18,7 +18,7 @@ jobs:
           base_branch='${{ vars.DEFAULT_BRANCH }}'
 
           for feature_branch in ${{ vars.FEATURE_BRANCHES }}; do
-            git fetch origin/$feature_branch
+            git fetch origin $feature_branch
 
             # Compare $base_branch with the feature branch
             if [[ $(git log --oneline $feature_branch..$base_branch) ]]; then
