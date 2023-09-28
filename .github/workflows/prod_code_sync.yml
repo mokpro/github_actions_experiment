@@ -15,7 +15,7 @@ jobs:
 
       - name: Iterate over feature branches
         run: |
-          base_branch="$DEFAULT_BRANCH"
+          base_branch='${{ vars.DEFAULT_BRANCH }}'
           git checkout $base_branch
           git fetch $base_branch
           git reset --hard origin/$base_branch
