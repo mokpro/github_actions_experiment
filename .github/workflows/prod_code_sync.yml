@@ -17,40 +17,40 @@ jobs:
         run: |
           base_branch='${{ vars.DEFAULT_BRANCH }}'
 
-          for branch in ${{ vars.FEATURE_BRANCHES }}; do
-            feature_branch="refs/remotes/origin/$branch"
+          for feature_branch in ${{ vars.FEATURE_BRANCHES }}; do
+            git fetch origin/$feature_branch
 
             # Compare $base_branch with the feature branch
             if [[ $(git log --oneline $feature_branch..$base_branch) ]]; then
-              echo "$base_branch has newer commits than $branch"
+              echo "$base_branch has newer commits than $feature_branch"
               
               # Merge $base_branch into feature branch
-              git checkout $branch
-              git merge $base_branch -m "Merge $base_branch into $branch"
+              git checkout $feature_branch
+              git merge $base_branch -m "Merge $base_branch into $feature_branch"
               
               # Check if the merge was successful
               if [ $? -eq 0 ]; then
                 echo "Merge successful. Creating a pull request..."
-                new_branch="merge-$base_branch-to-$branch"
+                new_branch="merge-$base_branch-to-$feature_branch"
                 git checkout -b $new_branch
                 gh pr create \
-                  --base $branch \
+                  --base $feature_branch \
                   --head $base_branch \
-                  --title "Merge $base_branch into $branch" \
-                  --body "This pull request merges $base_branch into $branch." \
+                  --title "Merge $base_branch into $feature_branch" \
+                  --body "This pull request merges $base_branch into $feature_branch." \
                   --label "auto-update" \
                   --reviewer ${{ vars.REVIEWERS }}
                 
                 if [ $? -ne 0 ]; then
-                  echo "Failed to create PR merging $base_branch into $branch"
+                  echo "Failed to create PR merging $base_branch into $feature_branch"
                 fi
 
               else
-                echo "Failed to merge $base_branch into $branch"
+                echo "Failed to merge $base_branch into $feature_branch"
                 git merge --abort
               fi
             else
-              echo "$branch is up to date with $base_branch"
+              echo "$feature_branch is up to date with $base_branch"
             fi
           done
         env:
