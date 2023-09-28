@@ -26,7 +26,7 @@ jobs:
               
               # Merge $base_branch into feature branch
               git checkout $feature_branch
-              git merge $base_branch -m "Merge $base_branch into $feature_branch"
+              git merge --no-ff $base_branch
               
               # Check if the merge was successful
               if [ $? -eq 0 ]; then
