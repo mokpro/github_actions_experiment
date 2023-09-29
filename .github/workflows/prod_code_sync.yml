@@ -16,8 +16,8 @@ jobs:
       - name: Iterate over feature branches
         run: |
 
-          git config --global user.email "${{ vars.USER_EMAIL }}"
-          git config --global user.name "${{ vars.USER_NAME }}"
+          git config --global user.email "${{ secrets.USER_EMAIL }}"
+          git config --global user.name "${{ secrets.USER_NAME }}"
 
           base_branch='${{ vars.DEFAULT_BRANCH }}'
 
