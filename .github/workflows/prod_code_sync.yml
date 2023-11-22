@@ -45,12 +45,12 @@ jobs:
                   --label "auto-update"                
                 if [ $? -ne 0 ]; then
                   msg = "Failed to create PR merging $base_branch into $feature_branch"
-                  curl -d "text=$msg" -d "channel=github-test" -H "Authorization: Bearer xoxb-3322043990433-6227823403830-KraD3HGXvkTztn2DAUqXaMUM" -X POST https://slack.com/api/chat.postMessage
+                  curl -d "text=$msg" -d "channel=github-test" -H "Authorization: Bearer secrets.SLACK_TOKEN" -X POST https://slack.com/api/chat.postMessage
                 fi
 
               else
                 msg = "Failed to merge $base_branch into $feature_branch"
-                curl -d "text=$msg" -d "channel=github-test" -H "Authorization: Bearer xoxb-3322043990433-6227823403830-KraD3HGXvkTztn2DAUqXaMUM" -X POST https://slack.com/api/chat.postMessage
+                curl -d "text=$msg" -d "channel=github-test" -H "Authorization: Bearer secrets.SLACK_TOKEN" -X POST https://slack.com/api/chat.postMessage
                 git merge --abort
               fi
             else
