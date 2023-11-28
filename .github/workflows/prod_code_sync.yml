@@ -49,8 +49,7 @@ jobs:
                 fi
 
               else
-                msg = "Failed to merge $base_branch into $feature_branch"
-                curl -d "text=$msg" -d "channel=github-test" -H "Authorization: Bearer secrets.SLACK_TOKEN" -X POST https://slack.com/api/chat.postMessage
+                echo "Failed to merge $base_branch into $feature_branch"
                 git merge --abort
               fi
             else
