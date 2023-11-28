@@ -49,7 +49,7 @@ jobs:
                 fi
 
               else
-                echo "Failed to merge $base_branch into $feature_branch"
+                echo "Failed to merge $base_branch into the $feature_branch"
                 git merge --abort
               fi
             else
