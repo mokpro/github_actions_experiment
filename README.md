@@ -1,3 +1,3 @@
 # github_actions_experiment
-This is uat_env_branch
+This is slack-notification
 Experimenting github actions

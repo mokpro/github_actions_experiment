@@ -20,7 +20,7 @@ jobs:
           git config --global user.name "${{ secrets.USER_NAME }}"
 
           base_branch='${{ vars.DEFAULT_BRANCH }}'
-
+          set +e
           for feature_branch in ${{ vars.FEATURE_BRANCHES }}; do
             git fetch origin $feature_branch
 
@@ -31,7 +31,7 @@ jobs:
               # Merge $base_branch into feature branch
               git checkout $feature_branch
               git merge --no-ff --allow-unrelated-histories $base_branch
-              
+
               # Check if the merge was successful
               if [ $? -eq 0 ]; then
                 echo "Merge successful. Creating a pull request..."
@@ -44,18 +44,21 @@ jobs:
                   --body "This pull request merges $base_branch into $feature_branch." \
                   --label "auto-update"                
                 if [ $? -ne 0 ]; then
-                  msg = "Failed to create PR merging $base_branch into $feature_branch"
-                  curl -d "text=$msg" -d "channel=github-test" -H "Authorization: Bearer xoxb-3322043990433-6227823403830-KraD3HGXvkTztn2DAUqXaMUM" -X POST https://slack.com/api/chat.postMessage
+                  msg="Failed to create PR merging $base_branch into $feature_branch"
+                  echo $msg
+                  curl -d "text=$msg" -d "channel=github-test" -H "Authorization: Bearer ${{ secrets.SLACK_TOKEN }}" -X POST https://slack.com/api/chat.postMessage
                 fi
 
               else
-                msg = "Failed to merge $base_branch into $feature_branch"
-                curl -d "text=$msg" -d "channel=github-test" -H "Authorization: Bearer xoxb-3322043990433-6227823403830-KraD3HGXvkTztn2DAUqXaMUM" -X POST https://slack.com/api/chat.postMessage
+                msg="Failed to merge $base_branch into the $feature_branch"
+                echo $msg
+                curl -d "text=$msg" -d "channel=github-test" -H "Authorization: Bearer ${{ secrets.SLACK_TOKEN }}" -X POST https://slack.com/api/chat.postMessage
                 git merge --abort
               fi
             else
               echo "$feature_branch is up to date with $base_branch"
             fi
+            echo "Iterated branch $feature_branch"
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
