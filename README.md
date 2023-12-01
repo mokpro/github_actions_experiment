@@ -1,3 +1,3 @@
 # github_actions_experiment
-This is slack-notification-1
+This is slack-notification
 Experimenting github actions
