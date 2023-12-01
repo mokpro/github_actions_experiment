@@ -30,10 +30,10 @@ jobs:
               
               # Merge $base_branch into feature branch
               git checkout $feature_branch
-              git merge --no-ff --allow-unrelated-histories $base_branch
+              merge_status=$(git merge --no-ff --allow-unrelated-histories $base_branch)
               
               # Check if the merge was successful
-              if [ $? -eq 0 ]; then
+              if [ $merge_status -eq 0 ]; then
                 echo "Merge successful. Creating a pull request..."
                 new_branch="merge-$base_branch-to-$feature_branch"
                 git checkout -b $new_branch
@@ -44,12 +44,15 @@ jobs:
                   --body "This pull request merges $base_branch into $feature_branch." \
                   --label "auto-update"                
                 if [ $? -ne 0 ]; then
-                  msg = "Failed to create PR merging $base_branch into $feature_branch"
+                  msg="Failed to create PR merging $base_branch into $feature_branch"
+                  echo $msg
                   curl -d "text=$msg" -d "channel=github-test" -H "Authorization: Bearer secrets.SLACK_TOKEN" -X POST https://slack.com/api/chat.postMessage
                 fi
 
               else
-                echo "Failed to merge $base_branch into the $feature_branch"
+                msg="Failed to merge $base_branch into the $feature_branch"
+                echo $msg
+                curl -d "text=$msg" -d "channel=github-test" -H "Authorization: Bearer secrets.SLACK_TOKEN" -X POST https://slack.com/api/chat.postMessage
                 git merge --abort
               fi
             else
