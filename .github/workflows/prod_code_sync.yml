@@ -31,7 +31,6 @@ jobs:
               # Merge $base_branch into feature branch
               git checkout $feature_branch
               git merge --no-ff --allow-unrelated-histories $base_branch
-              echo 'After merge----------------'
 
               # Check if the merge was successful
               if [ $? -eq 0 ]; then
