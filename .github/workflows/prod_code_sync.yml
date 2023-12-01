@@ -1,0 +1,60 @@
+name: Merge features from Default Branch to Feature Branch and Notify
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync_commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Iterate over feature branches
+        run: |
+
+          git config --global user.email "${{ secrets.USER_EMAIL }}"
+          git config --global user.name "${{ secrets.USER_NAME }}"
+
+          base_branch='${{ vars.DEFAULT_BRANCH }}'
+
+          for feature_branch in ${{ vars.FEATURE_BRANCHES }}; do
+            git fetch origin $feature_branch
+
+            # Compare $base_branch with the feature branch
+            if [[ $(git log --oneline origin/$feature_branch..$base_branch) ]]; then
+              echo "$base_branch has newer commits than $feature_branch"
+              
+              # Merge $base_branch into feature branch
+              git checkout $feature_branch
+              git merge --no-ff --allow-unrelated-histories $base_branch
+              
+              # Check if the merge was successful
+              if [ $? -eq 0 ]; then
+                echo "Merge successful. Creating a pull request..."
+                new_branch="merge-$base_branch-to-$feature_branch"
+                git checkout -b $new_branch
+                gh pr create \
+                  --base $feature_branch \
+                  --head $base_branch \
+                  --title "Merge $base_branch into $feature_branch" \
+                  --body "This pull request merges $base_branch into $feature_branch." \
+                  --label "auto-update"                
+                if [ $? -ne 0 ]; then
+                  msg = "Failed to create PR merging $base_branch into $feature_branch"
+                  curl -d "text=$msg" -d "channel=github-test" -H "Authorization: Bearer secrets.SLACK_TOKEN" -X POST https://slack.com/api/chat.postMessage
+                fi
+
+              else
+                echo "Failed to merge $base_branch into $feature_branch"
+                git merge --abort
+              fi
+            else
+              echo "$feature_branch is up to date with $base_branch"
+            fi
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
