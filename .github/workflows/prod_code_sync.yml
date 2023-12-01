@@ -31,7 +31,7 @@ jobs:
               # Merge $base_branch into feature branch
               git checkout $feature_branch
               merge_status=$(git merge --no-ff --allow-unrelated-histories $base_branch)
-              
+              echo 'After merge----------------'
               # Check if the merge was successful
               if [ $merge_status -eq 0 ]; then
                 echo "Merge successful. Creating a pull request..."
