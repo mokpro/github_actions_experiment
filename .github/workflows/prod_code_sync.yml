@@ -58,6 +58,7 @@ jobs:
             else
               echo "$feature_branch is up to date with $base_branch"
             fi
+            echo "Iterated branch $feature_branch"
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
