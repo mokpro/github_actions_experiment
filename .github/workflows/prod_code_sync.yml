@@ -20,7 +20,7 @@ jobs:
           git config --global user.name "${{ secrets.USER_NAME }}"
 
           base_branch='${{ vars.DEFAULT_BRANCH }}'
-
+          set +e
           for feature_branch in ${{ vars.FEATURE_BRANCHES }}; do
             git fetch origin $feature_branch
 
